@@ -22,7 +22,19 @@ var drawMenu = function() {
     );
 };
 
-var phonebook = [{ adam: '111-1111-1111' }, { david: '222-2222-2222' }];
+var JSONToPhonebook = function() {
+    readFile('phonebook.json').then(function(text) {
+        var phonebookText = JSON.parse(text.toString());
+        phonebook.push(phonebookText);
+    });
+};
+
+var phonebooktoJSON = function() {
+    phonebook.forEach(function(phoneNum) {
+        var phoneNumJSON = JSON.stringify(phoneNum);
+        writeFile('phonebook.json', phoneNumJSON).then(function() {});
+    });
+};
 
 var main = function() {
     drawMenu();
@@ -35,26 +47,10 @@ var main = function() {
     });
 };
 
-var appendToPhonebook = function() {
-    readFile('phonebook.json').then(function(text) {
-        var phonebookText = JSON.parse(text.toString());
-        phonebook.push(phonebookText);
-    });
-};
-
-appendToPhonebook();
-
-var appendtoFile = function() {
-    phonebook.forEach(function(phoneNum) {
-        var phoneNumJSON = JSON.stringify(phoneNum);
-        writeFile('phonebook.json', phoneNumJSON).then(function() {});
-    });
-};
-
-appendtoFile();
+var phonebook = [];
 
 var lookUpEntry = function(callback) {
-    rl.question('What is the name?', function(name) {
+    rl.question('What is the name? ', function(name) {
         console.log(name);
         for (var objects of phonebook) {
             console.log(objects);
@@ -64,6 +60,7 @@ var lookUpEntry = function(callback) {
         }
         callback();
     });
+    JSONToPhonebook()
 };
 
 var setEntry = function(callback) {
@@ -75,6 +72,7 @@ var setEntry = function(callback) {
             phonebook.push(content);
             console.log(`entry stored for ${name}`);
             callback();
+            phonebooktoJSON()
         });
     });
 };
@@ -86,6 +84,7 @@ var deleteEntry = function(callback) {
             console.log(phonebook);
         }
         callback();
+        phonebooktoJSON()
     });
 };
 
